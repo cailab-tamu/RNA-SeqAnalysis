@@ -15,10 +15,10 @@ uniqueDonors <- unique(fileMap[,1])
 
 # Running SALMON
 for (donor in uniqueDonors){
-  donorFiles <- fileMap[fileMap[,1]==donor,3]
-  donorFiles <- donorFiles[grepl("fastq",donorFiles)]
-  donorFiles <- files[gsub("^\\_[[:alnum:]]+\\_","",files) %in% gsub(".cip$","",donorFiles)]
-  if (all(donorFiles%in%files)){
+  filesDonor <- fileMap[fileMap[,1]==donor,3]
+  filesDonor <- filesDonor[grepl("fastq",filesDonor)]
+  filesDonor <- donorFiles[gsub("^\\_[[:alnum:]]+\\_","",donorFiles) %in% gsub(".cip$","",filesDonor)]
+  if (all(donorFiles%in%filesDonor)){
     if (length(donorFiles)==1){
       command <- paste0("salmon quant -i genecodeIndexSalmon -l SR -p 8 -r <(gunzip -c ", args[1], donorFiles, ") " , "-o ", args[3], "/", donor)
       writeLines(command, ".command.sh")
