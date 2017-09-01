@@ -7,13 +7,13 @@
 
 
 # Argument to associate the folder where the fastq files are placed
-export inputData = $1
+export inputData=$1
 
 # Argument to associate the mapFile
-export mapFile = $2
+export mapFile=$2
 
 # Argument to associate an output folder
-export outputFolder = $3
+export outputFolder=$3
 
 # Download the transcript from GeneCodeGenes Release 19 (GRCh37.p13)
 wget -nc ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.pc_transcripts.fa.gz
@@ -22,6 +22,7 @@ wget -nc ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19
 gunzip gencode.v19.pc_transcripts.fa.gz
 
 # Enter into the outputFolder
+mkdir $outputFolder
 cd $outputFolder
 
 # Create the index for the transcript
@@ -31,4 +32,4 @@ salmon index -t ../gencode.v19.pc_transcripts.fa -i genecodeIndex
 mkdir expressionValues
 
 # Running SALMON
-Rscript --vanilla runningSALMON $1 $2 expressionValues/
+Rscript --vanilla ../runningSalmon.R $1 $2 expressionValues/
