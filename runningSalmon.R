@@ -18,9 +18,9 @@ for (donor in uniqueDonors){
   filesDonor <- fileMap[fileMap[,1]==donor,3]
   filesDonor <- filesDonor[grepl("fastq",filesDonor)]
   filesDonor <- donorFiles[gsub("^\\_[[:alnum:]]+\\_","",donorFiles) %in% gsub(".cip$","",filesDonor)]
-  if (all(donorFiles%in%filesDonor)){
-    if (length(donorFiles)==1){
-      command <- paste0("salmon quant -i genecodeIndexSalmon -l SR -p 8 -r <(gunzip -c ", args[1], donorFiles, ") " , "-o ", args[3], "/", donor)
+  if (all(filesDonor%in%donorFiles)){
+    if (length(filesDonor)==1){
+      command <- paste0("salmon quant -i genecodeIndex -l SR -p 8 -r <(gunzip -c ", args[1], filesDonor, ") " , "-o ", args[3], donor)
       writeLines(command, ".command.sh")
       system("bash .command.sh")
     }
