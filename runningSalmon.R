@@ -37,15 +37,19 @@ for (donor in uniqueDonors){
   
   # Set up the matrix
   if(!initMatrix){
-    initMatrix <- TRUE
-    allValues <<- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
-    colnames(allValues)[donorNumber <- donorNumber+1] <- donor
-    next()
+    if(file.exists(paste0(args[3],"/",donor,"/quant.sf"))){
+      initMatrix <- TRUE
+      allValues <<- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
+      colnames(allValues)[donorNumber <- donorNumber+1] <- donor
+      next()
+    }
   }
   # Add values
-  values <- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
-  allValues <<- merge.data.frame(x = allValues, y = values,by = "Name",all = TRUE)
-  colnames(allValues)[donorNumber <- donorNumber+1] <- donor
+  if(file.exists(paste0(args[3],"/",donor,"/quant.sf"))){
+    values <- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
+    allValues <<- merge.data.frame(x = allValues, y = values,by = "Name",all = TRUE)
+    colnames(allValues)[donorNumber <- donorNumber+1] <- donor
+  }
 }
 # Writing the output file
 write.table(x = allValues, file = "expressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
