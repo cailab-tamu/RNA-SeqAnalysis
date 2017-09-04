@@ -1,3 +1,8 @@
+# runningSalmon
+# Daniel Camilo Osorio
+# Biomedical Sciences PhD Program
+# Cai Lab - Texas A&M University, College Station, TX.
+
 # Activate the input arguments
 args <- commandArgs(trailingOnly = TRUE)
 
