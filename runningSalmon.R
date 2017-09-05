@@ -40,7 +40,7 @@ for (donor in uniqueDonors){
       system("bash .command.sh")
     }
   }
-  
+
   # Set up the matrix
   if(!initMatrix){
     if(file.exists(paste0(args[3],"/",donor,"/quant.sf"))){
@@ -58,4 +58,21 @@ for (donor in uniqueDonors){
   }
 }
 # Writing the output file
-write.table(x = allValues, file = "expressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(x = allValues, file = "transcriptExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
+
+# GeneExpression
+GENEID <- unlist(lapply(strsplit(as.vector(allValues[,"Name"]), "\\|"), function(id){id[2]}))
+TXNAME <- as.vector(allValues[,"Name"])
+TX2GENE <- as.data.frame(cbind(TXNAME,GENEID))
+
+# OutputFiles
+files <- file.path("expressionValues",uniqueDonors,"quant.sf")
+files <- files[file.exists(files)]
+
+# GE
+library(tximport)
+geneExpression <- tximport(files = files,type = "salmon",tx2gene = TX2GENE)
+write.table(x = geneExpression$count, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
+
+
+
