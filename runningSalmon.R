@@ -32,12 +32,12 @@ for (donor in uniqueDonors){
     if (length(filesDonor)==1){
       command <- paste0("salmon quant -i genecodeIndex -l SR -p 8 -r <(gunzip -c ", args[1], filesDonor, ") " , "-o ", args[3], donor)
       writeLines(command, ".command.sh")
-      system("bash .command.sh")
+      # system("bash .command.sh")
       # If pair end
     } else if(length(filesDonor)==2){
       command <- paste0("salmon quant -i genecodeIndex -l UI -p 8 -1 <(gunzip -c ", args[1], filesDonor[grepl("pair1",filesDonor)], ") -2 <(gunzip -c ", args[1], filesDonor[grepl("pair2",filesDonor)], ") -o ", args[3], donor)
       writeLines(command, ".command.sh")
-      system("bash .command.sh")
+      # system("bash .command.sh")
     }
   }
 
@@ -72,7 +72,7 @@ files <- files[file.exists(files)]
 # GE
 library(tximport)
 geneExpression <- tximport(files = files,type = "salmon",tx2gene = TX2GENE)
-write.table(x = geneExpression$count, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(x = geneExpression$counts, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
 
 
 
