@@ -99,9 +99,9 @@ write.table(x = geneExpression$counts,
 
 # Quantile Normalization
 library(preprocessCore)
-qN <- normalize.quantiles(as.matrix(geneExpression))
-colnames(qN) <- colnames(geneExpression)
-rownames(qN) <- rownames(geneExpression)
+qN <- normalize.quantiles(as.matrix(geneExpression$counts))
+colnames(qN) <- colnames(geneExpression$counts)
+rownames(qN) <- rownames(geneExpression$counts)
 
 # Log-Transformation
 logT <- log2(qN+1)
