@@ -57,22 +57,25 @@ for (donor in uniqueDonors){
     colnames(allValues)[donorNumber <- donorNumber+1] <- donor
   }
 }
-# Writing the output file
+# Write the output file
 write.table(x = allValues, file = "transcriptExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
 
-# GeneExpression
-GENEID <- unlist(lapply(strsplit(as.vector(allValues[,"Name"]), "\\|"), function(id){id[2]}))
+# Create a dictionary of the Ensambl Gene IDs
+GENEID <- gsub("\\.[[:digit:]]+$","",unlist(lapply(strsplit(as.vector(allValues[,"Name"]), "\\|"), function(id){id[2]})))
 TXNAME <- as.vector(allValues[,"Name"])
 TX2GENE <- as.data.frame(cbind(TXNAME,GENEID))
 
-# OutputFiles
+# Read the SALMON output files
 files <- file.path("expressionValues",uniqueDonors,"quant.sf")
-files <- files[file.exists(files)]
+fileExists <- file.exists(files)
+files <- files[fileExists]
 
-# GE
+# Calculate the geneExpression
 library(tximport)
 geneExpression <- tximport(files = files,type = "salmon",tx2gene = TX2GENE)
-write.table(x = geneExpression$counts, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
+colnames(geneExpression$counts) <- uniqueDonors[fileExists]
 
+# Write the output file
+write.table(x = geneExpression$counts, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
 
 
