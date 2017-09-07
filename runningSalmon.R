@@ -45,20 +45,30 @@ for (donor in uniqueDonors){
   if(!initMatrix){
     if(file.exists(paste0(args[3],"/",donor,"/quant.sf"))){
       initMatrix <- TRUE
-      allValues <<- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
+      allValues <<- read.csv(paste0(args[3],"/",donor,"/quant.sf"), 
+                             sep= "\t")[,c("Name","NumReads")]
       colnames(allValues)[donorNumber <- donorNumber+1] <- donor
       next()
     }
   }
   # Add values
   if(file.exists(paste0(args[3],"/",donor,"/quant.sf"))){
-    values <- read.csv(paste0(args[3],"/",donor,"/quant.sf"), sep= "\t")[,c("Name","NumReads")]
-    allValues <<- merge.data.frame(x = allValues, y = values,by = "Name",all = TRUE)
+    values <- read.csv(paste0(args[3],"/",donor,"/quant.sf"), 
+                       sep= "\t")[,c("Name","NumReads")]
+    allValues <<- merge.data.frame(x = allValues, 
+                                   y = values,
+                                   by = "Name",
+                                   all = TRUE
+                                   )
     colnames(allValues)[donorNumber <- donorNumber+1] <- donor
   }
 }
 # Write the output file
-write.table(x = allValues, file = "transcriptExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(x = allValues, file = "transcriptExpressionValues.tsv", 
+            quote = FALSE, 
+            sep = "\t", 
+            row.names = FALSE
+            )
 
 # Create a dictionary of the Ensambl Gene IDs
 GENEID <- gsub("\\.[[:digit:]]+$","",unlist(lapply(strsplit(as.vector(allValues[,"Name"]), "\\|"), function(id){id[2]})))
@@ -72,11 +82,20 @@ files <- files[fileExists]
 
 # Calculate the geneExpression
 library(tximport)
-geneExpression <- tximport(files = files,type = "salmon",tx2gene = TX2GENE)
+geneExpression <- tximport(files = files,
+                           type = "salmon",
+                           tx2gene = TX2GENE
+                           )
 colnames(geneExpression$counts) <- uniqueDonors[fileExists]
 
 # Write the output file
-write.table(x = geneExpression$counts, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
+write.table(x = geneExpression$counts, 
+            file = "geneExpressionValues.tsv", 
+            quote = FALSE, 
+            sep = "\t", 
+            row.names = TRUE, 
+            col.names = TRUE
+            )
 
 # Quantile Normalization
 library(preprocessCore)
@@ -88,4 +107,10 @@ rownames(qN) <- rownames(geneExpression)
 logT <- log2(qN+1)
 
 # Write the output file
-write.table(x = logT, file = "qN-LogT_ExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
+write.table(x = logT, 
+            file = "qN-LogT_ExpressionValues.tsv", 
+            quote = FALSE, 
+            sep = "\t", 
+            row.names = TRUE, 
+            col.names = TRUE
+            )
