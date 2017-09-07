@@ -78,4 +78,9 @@ colnames(geneExpression$counts) <- uniqueDonors[fileExists]
 # Write the output file
 write.table(x = geneExpression$counts, file = "geneExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
 
+# Quantile Normalization
+library(preprocessCore)
+qN <- normalize.quantiles(as.matrix(geneExpression))
+colnames(qN) <- colnames(geneExpression)
+rownames(qN) <- rownames(geneExpression)
 
