@@ -84,3 +84,8 @@ qN <- normalize.quantiles(as.matrix(geneExpression))
 colnames(qN) <- colnames(geneExpression)
 rownames(qN) <- rownames(geneExpression)
 
+# Log-Transformation
+logT <- log2(qN+1)
+
+# Write the output file
+write.table(x = logT, file = "qN-LogT_ExpressionValues.tsv", quote = FALSE, sep = "\t", row.names = TRUE, col.names = TRUE)
