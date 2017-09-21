@@ -27,7 +27,7 @@ gunzip -k gencode.v27.annotation.gtf.gz
 
 # STAR index
 mkdir genomeDir
-STAR --runThreadN 4 \
+STAR --runThreadN 20 \
      --runMode genomeGenerate \
      --genomeDir genomeDir \
      --genomeFastaFiles GRCh38.p10.genome.fa \
@@ -35,7 +35,7 @@ STAR --runThreadN 4 \
      --sjdbOverhang 99
 
 # STAR mapping
-STAR --runThreadN 4 \
+STAR --runThreadN 20 \
      --runMode alignReads \
      --genomeDir genomeDir \
      --readFilesIn $1 ${2:-} \
