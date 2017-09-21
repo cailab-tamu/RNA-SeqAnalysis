@@ -4,7 +4,7 @@
 # Texas A&M University, College Station, TX.
 
 # Verify the installation
-if ! [ -x "$(command -v star)" ]; then
+if ! [ -x "$(command -v STAR)" ]; then
   wget -nc https://github.com/alexdobin/STAR/archive/2.5.3a.tar.gz
   tar -xzf 2.5.3a.tar.gz
   cd STAR-2.5.3a/
