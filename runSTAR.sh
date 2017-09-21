@@ -26,6 +26,7 @@ wget -nc ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_27/gencode.v27
 gunzip -k gencode.v27.annotation.gtf.gz
 
 # STAR index
+mkdir genomeDir
 STAR --runThreadN 4 \
      --runMode genomeGenerate \
      --genomeDir genomeDir \
