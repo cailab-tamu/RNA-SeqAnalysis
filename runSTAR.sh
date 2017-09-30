@@ -19,15 +19,15 @@ fi
 
 # Download the genome data
 wget -nc ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_27/GRCh38.p10.genome.fa.gz
-gunzip -k GRCh38.p10.genome.fa.gz
+gunzip GRCh38.p10.genome.fa.gz
 
 # Download the annotation data
 wget -nc ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_27/gencode.v27.annotation.gtf.gz
-gunzip -k gencode.v27.annotation.gtf.gz
+gunzip gencode.v27.annotation.gtf.gz
 
 # STAR index
 mkdir genomeDir
-STAR --runThreadN 4 \
+STAR --runThreadN 20 \
      --runMode genomeGenerate \
      --genomeDir genomeDir \
      --genomeFastaFiles GRCh38.p10.genome.fa \
@@ -35,7 +35,7 @@ STAR --runThreadN 4 \
      --sjdbOverhang 99
 
 # STAR mapping
-STAR --runThreadN 4 \
+STAR --runThreadN 20 \
      --runMode alignReads \
      --genomeDir genomeDir \
      --readFilesIn $1 ${2:-} \
