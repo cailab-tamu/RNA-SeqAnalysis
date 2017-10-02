@@ -40,4 +40,5 @@ STAR --runThreadN 20 \
      --genomeDir genomeDir \
      --readFilesIn $1 ${2:-} \
      --sjdbGTFfile gencode.v27.annotation.gtf \
-     --outSAMtype BAM SortedByCoordinates
+     --outSAMtype BAM SortedByCoordinate \
+     --outFileNamePrefix $1
