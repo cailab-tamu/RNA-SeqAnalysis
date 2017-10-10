@@ -1,0 +1,165 @@
+#install.packages("ggplot2")
+#install.packages("readr")
+library(ggplot2)
+library(readr)
+##############################################
+# M DATA
+##############################################
+download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/M-expressionMatrix_TPM%2BQN%2BLogT.csv",
+              destfile = "dataFiles/M-expressionMatrix_TPM+QN+LogT.csv"
+              )
+M_BLUEPRINT <- read_csv("dataFiles/M-expressionMatrix_TPM+QN+LogT.csv")
+bpM_ENSEMBL <- M_BLUEPRINT$ENSEMBL
+bpM_MEAN <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,mean)
+bpM_SD <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,sd)
+bpM_VAR <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,var)
+bpM_CV <- bpM_SD/bpM_MEAN
+bpM_FF <- bpM_VAR/bpM_MEAN
+giniCoefficient <- function(data){
+  numerator <- sum(abs(rowSums(expand.grid(data,-1*data))))
+  denominator <- 2*length(data)*sum(data)
+  return(numerator/denominator)
+}
+bpM_GC <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,giniCoefficient)
+output <- cbind(ENSEMBL = bpM_ENSEMBL, MEAN=bpM_MEAN, SD=bpM_SD, VAR=bpM_VAR, CV = bpM_CV, FF=bpM_FF, GC = bpM_GC)
+write.csv(output,"dataFiles/BLUEPRINT_M.csv", quote = FALSE, row.names = FALSE)
+
+##############################################
+# T DATA
+##############################################
+download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/T-expressionMatrix_TPM%2BQN%2BLogT.csv",
+              destfile = "dataFiles/T-expressionMatrix_TPM+QN+LogT.csv"
+              )
+T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
+bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
+bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,mean)
+bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,sd)
+bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,var)
+bpT_CV <- bpT_SD/bpT_MEAN
+bpT_FF <- bpT_VAR/bpT_MEAN
+bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,giniCoefficient)
+output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
+write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
+
+##############################################
+# T PLOTS
+##############################################
+BLUEPRINT_T <- read_csv("dataFiles/BLUEPRINT_T.csv")
+NaiveT <- read_csv("dataFiles/10XGENOMICS_NaiveT.csv")
+merged <- merge(BLUEPRINT_T,NaiveT,by = "ENSEMBL")
+merged <- merged[complete.cases(merged),]
+colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV",
+                      "RNAseq_FF", "RNAseq_GC", "scRNAseq_MEAN",
+                      "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV", "scRNAseq_FF", "scRNAseq_GC")
+write.csv(merged, "dataFiles/dataT.csv", row.names = FALSE, quote = FALSE)
+
+pdf("allDataAnalysis/T-CVvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_CV)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="log(CV) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-FFvsFF.pdf")
+x <- log(1+merged$scRNAseq_FF)
+y <- log(1+merged$RNAseq_FF)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "log(FF) (scRNA-seq)", 
+       y="log(FF) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-FFvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_FF)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="log(FF) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-CVvsGC.pdf")
+x <- merged$scRNAseq_CV
+y <- merged$RNAseq_GC
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="GC (RNA-seq)")
+dev.off()
+
+##############################################
+# M PLOTS
+##############################################
+BLUEPRINT_M <- read_csv("dataFiles/BLUEPRINT_M.csv")
+Monocytes <- read_csv("dataFiles/10XGENOMICS_Monocytes.csv")
+merged <- merge(BLUEPRINT_M,Monocytes,by = "ENSEMBL")
+merged <- merged[complete.cases(merged),]
+colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV", "RNAseq_FF",
+                      "RNAseq_GC", "scRNAseq_MEAN", "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV",
+                      "scRNAseq_FF", "scRNAseq_GC")
+write.csv(merged, "dataFiles/dataM.csv", row.names = FALSE, quote = FALSE)
+
+library(ggplot2)
+pdf("allDataAnalysis/M-CVvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_CV)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="log(CV) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-FFvsFF.pdf")
+x <- log(1+merged$scRNAseq_FF)
+y <- log(1+merged$RNAseq_FF)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "log(FF) (scRNA-seq)", 
+       y="log(FF) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-FFvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_FF)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="log(FF) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-CVvsGC.pdf")
+x <- merged$scRNAseq_CV
+y <- merged$RNAseq_GC
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)", 
+       y="GC (RNA-seq)")
+dev.off()
+
+
