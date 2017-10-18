@@ -16,7 +16,7 @@ correlationAnalysis <- function(dataFile, genesFile, pathwaysFile, nGenes=15, rL
     data[data[,"GENECARD"] %in%pathway,2]
   })
   data_pathway <- data_pathway[unlist(lapply(data_pathway,function(pathway){dim(pathway)[1]>nGenes}))]
-  correlations <- expand.grid(c(1:6),c(7:12))
+  correlations <- cbind(c(1:6),c(7:12))
   cor_pathway <- lapply(data_pathway,function(pathway){
     sapply(seq_len(nrow(correlations)),function(pair){
       x<-pathway[,correlations[pair,1]]
@@ -74,15 +74,15 @@ correlationAnalysis(dataFile = "dataFiles/dataM.csv",
                     pathwaysFile = "dataFiles/pathways.txt",
                     nGenes = 15, 
                     rLimit = 0.9, 
-                    pLimit = 0.05,
+                    pLimit = 0.005,
                     CI = 0.95,
-                    outFolder = "M_pathwaysAnalysis")
+                    outFolder = "pathwayAnalysis/M/")
 
 correlationAnalysis(dataFile = "dataFiles/dataT.csv",
                     genesFile = "dataFiles/genes.tsv", 
                     pathwaysFile = "dataFiles/pathways.txt",
                     nGenes = 15, 
                     rLimit = 0.9, 
-                    pLimit = 0.05,
+                    pLimit = 0.005,
                     CI = 0.95,
-                    outFolder = "T_pathwaysAnalysis")
+                    outFolder = "pathwayAnalysis/T/")
