@@ -65,42 +65,65 @@ ggplot(data, aes(x=x, y=y)) +
        y="log(CV) (RNA-seq)")
 dev.off()
 
+pdf("allDataAnalysis/T-MEANvsMEAN.pdf")
+x <- merged$scRNAseq_MEAN
+y <- merged$RNAseq_MEAN
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "MEAN (scRNA-seq)", 
+       y="MEAN (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-SDvsSD.pdf")
+x <- merged$scRNAseq_SD
+y <- merged$RNAseq_SD
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "SD (scRNA-seq)", 
+       y="SD (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-VARvsVAR.pdf")
+x <- merged$scRNAseq_VAR
+y <- merged$RNAseq_VAR
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "VAR (scRNA-seq)", 
+       y="VAR (RNA-seq)")
+dev.off()
+
 pdf("allDataAnalysis/T-FFvsFF.pdf")
-x <- log(1+merged$scRNAseq_FF)
-y <- log(1+merged$RNAseq_FF)
+x <- merged$scRNAseq_FF
+y <- merged$RNAseq_FF
 data <- as.data.frame(cbind(x,y))
 ggplot(data, aes(x=x, y=y)) +
   geom_point(shape=16) +
   geom_smooth(method=lm, level = 0.95) + 
   theme_bw() +
-  labs(x = "log(FF) (scRNA-seq)", 
-       y="log(FF) (RNA-seq)")
+  labs(x = "FF (scRNA-seq)", 
+       y="FF (RNA-seq)")
 dev.off()
 
-pdf("allDataAnalysis/T-FFvsCV.pdf")
-x <- merged$scRNAseq_CV
-y <- log(1+merged$RNAseq_FF)
-data <- as.data.frame(cbind(x,y))
-ggplot(data, aes(x=x, y=y)) +
-  geom_point(shape=16) +
-  geom_smooth(method=lm, level = 0.95) + 
-  theme_bw() +
-  labs(x = "CV (scRNA-seq)", 
-       y="log(FF) (RNA-seq)")
-dev.off()
-
-pdf("allDataAnalysis/T-CVvsGC.pdf")
-x <- merged$scRNAseq_CV
+pdf("allDataAnalysis/T-GCvsGC.pdf")
+x <- merged$scRNAseq_GC
 y <- merged$RNAseq_GC
 data <- as.data.frame(cbind(x,y))
 ggplot(data, aes(x=x, y=y)) +
   geom_point(shape=16) +
   geom_smooth(method=lm, level = 0.95) + 
   theme_bw() +
-  labs(x = "CV (scRNA-seq)", 
+  labs(x = "GC (scRNA-seq)", 
        y="GC (RNA-seq)")
 dev.off()
-
 ##############################################
 # M PLOTS
 ##############################################
@@ -120,46 +143,68 @@ y <- log(1+merged$RNAseq_CV)
 data <- as.data.frame(cbind(x,y))
 ggplot(data, aes(x=x, y=y)) +
   geom_point(shape=16) +
-  geom_smooth(method=lm, level = 0.95) +
+  geom_smooth(method=lm, level = 0.95) + 
   theme_bw() +
   labs(x = "CV (scRNA-seq)", 
        y="log(CV) (RNA-seq)")
 dev.off()
 
-pdf("allDataAnalysis/M-FFvsFF.pdf")
-x <- log(1+merged$scRNAseq_FF)
-y <- log(1+merged$RNAseq_FF)
-data <- as.data.frame(cbind(x,y))
-ggplot(data, aes(x=x, y=y)) +
-  geom_point(shape=16) +
-  geom_smooth(method=lm, level = 0.95) +
-  theme_bw() +
-  labs(x = "log(FF) (scRNA-seq)", 
-       y="log(FF) (RNA-seq)")
-dev.off()
-
-pdf("allDataAnalysis/M-FFvsCV.pdf")
-x <- merged$scRNAseq_CV
-y <- log(1+merged$RNAseq_FF)
+pdf("allDataAnalysis/M-MEANvsMEAN.pdf")
+x <- merged$scRNAseq_MEAN
+y <- merged$RNAseq_MEAN
 data <- as.data.frame(cbind(x,y))
 ggplot(data, aes(x=x, y=y)) +
   geom_point(shape=16) +
   geom_smooth(method=lm, level = 0.95) + 
   theme_bw() +
-  labs(x = "CV (scRNA-seq)", 
-       y="log(FF) (RNA-seq)")
+  labs(x = "MEAN (scRNA-seq)", 
+       y="MEAN (RNA-seq)")
 dev.off()
 
-pdf("allDataAnalysis/M-CVvsGC.pdf")
-x <- merged$scRNAseq_CV
+pdf("allDataAnalysis/M-SDvsSD.pdf")
+x <- merged$scRNAseq_SD
+y <- merged$RNAseq_SD
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "SD (scRNA-seq)", 
+       y="SD (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-VARvsVAR.pdf")
+x <- merged$scRNAseq_VAR
+y <- merged$RNAseq_VAR
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "VAR (scRNA-seq)", 
+       y="VAR (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-FFvsFF.pdf")
+x <- merged$scRNAseq_FF
+y <- merged$RNAseq_FF
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) + 
+  theme_bw() +
+  labs(x = "FF (scRNA-seq)", 
+       y="FF (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-GCvsGC.pdf")
+x <- merged$scRNAseq_GC
 y <- merged$RNAseq_GC
 data <- as.data.frame(cbind(x,y))
 ggplot(data, aes(x=x, y=y)) +
   geom_point(shape=16) +
-  geom_smooth(method=lm, level = 0.95) +
+  geom_smooth(method=lm, level = 0.95) + 
   theme_bw() +
-  labs(x = "CV (scRNA-seq)", 
+  labs(x = "GC (scRNA-seq)", 
        y="GC (RNA-seq)")
 dev.off()
-
-
