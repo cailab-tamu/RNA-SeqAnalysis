@@ -12,6 +12,9 @@ correlationAnalysis <- function(dataFile, genesFile, pathwaysFile, nGenes=15, rL
   data_pathway <- lapply(pathways, function(pathway){
     data[data[,"GENECARD"] %in%pathway,3:14]
   })
+  gNames_pathway <- lapply(pathways, function(pathway){
+    data[data[,"GENECARD"] %in%pathway,2]
+  })
   data_pathway <- data_pathway[unlist(lapply(data_pathway,function(pathway){dim(pathway)[1]>nGenes}))]
   correlations <- expand.grid(c(1:6),c(7:12))
   cor_pathway <- lapply(data_pathway,function(pathway){
@@ -45,6 +48,7 @@ correlationAnalysis <- function(dataFile, genesFile, pathwaysFile, nGenes=15, rL
       xlabel <- gsub("RNAseq","RNA-seq",paste0(xlabel[1]," (",xlabel[2],")"))
       ylabel <- unlist(strsplit(variables[1],"\\_"))[c(2,1)]
       ylabel <- gsub("RNAseq","RNA-seq",paste0(ylabel[1]," (",ylabel[2],")"))
+      glabel <- as.vector(gNames_pathway[[i]])
       if(!is.na(correlationValue) & correlationValue > rLimit & pValue < pLimit){
         
         title <- paste0(unlist(strsplit(i,"\\_"))[-1], collapse = " ")
@@ -53,6 +57,7 @@ correlationAnalysis <- function(dataFile, genesFile, pathwaysFile, nGenes=15, rL
           geom_point(shape=16) +
           geom_smooth(method=lm, level = CI) +
           theme_bw() +
+          geom_text(aes(label=glabel),hjust=0.5, vjust=-1, cex=1.5) +
           labs(x = xlabel,
                y= ylabel,
                caption = paste("r=", round(correlationValue,4), "p=", pValue, sep=" ")) +ggtitle(label = title, subtitle = subtitle)
@@ -64,18 +69,18 @@ correlationAnalysis <- function(dataFile, genesFile, pathwaysFile, nGenes=15, rL
   }
 }
   
-correlationAnalysis(dataFile = "dataM.csv",
-                    genesFile = "genes.tsv", 
-                    pathwaysFile = "pathways.txt",
+correlationAnalysis(dataFile = "dataFiles/dataM.csv",
+                    genesFile = "dataFiles/genes.tsv", 
+                    pathwaysFile = "dataFiles/pathways.txt",
                     nGenes = 15, 
                     rLimit = 0.9, 
                     pLimit = 0.05,
                     CI = 0.95,
                     outFolder = "M_pathwaysAnalysis")
 
-correlationAnalysis(dataFile = "dataT.csv",
-                    genesFile = "genes.tsv", 
-                    pathwaysFile = "pathways.txt",
+correlationAnalysis(dataFile = "dataFiles/dataT.csv",
+                    genesFile = "dataFiles/genes.tsv", 
+                    pathwaysFile = "dataFiles/pathways.txt",
                     nGenes = 15, 
                     rLimit = 0.9, 
                     pLimit = 0.05,
