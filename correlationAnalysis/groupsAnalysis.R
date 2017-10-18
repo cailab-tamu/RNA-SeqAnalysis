@@ -1,20 +1,27 @@
 dataM <- read.csv("dataFiles/dataM.csv")
 dataT <- read.csv("dataFiles/dataT.csv")
 
-lmM <- lm(formula = (log(RNAseq_CV))~scRNAseq_CV, data = dataM)
-plot((log(dataM$RNAseq_CV))~dataM$scRNAseq_CV)
+# Linear model
+lmM <- lm(formula = (log(1+RNAseq_CV))~scRNAseq_CV, data = dataM)
+plot((log(1+dataM$RNAseq_CV))~dataM$scRNAseq_CV)
 abline(lmM, col= "red")
-ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataM$scRNAseq_CV), interval="conf", level = 0.95)
-limits <- cbind(gene= dataM$ENSEMBL,x=dataM$scRNAseq_CV,y=log(dataM$RNAseq_CV),ci)
 
+# Confidence intervals
+ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataM$scRNAseq_CV), interval="conf", level = 0.95)
+limits <- cbind(gene= dataM$ENSEMBL,x=dataM$scRNAseq_CV,y=log(1+dataM$RNAseq_CV),ci)
+
+# Split the groups
+pdf("genesByGroup/plotGroups.pdf")
 g1 <- limits[limits[,3]>limits[,6],]
-plot(x = g1[,2], y = g1[,3], col = "red", pch = 16, cex= 0.5, ylim=c(-5,1))
+plot(x = g1[,2], y = g1[,3], col = "red", pch = 16, cex= 0.5, ylim=c(0,1))
 g3 <- limits[limits[,3]<limits[,5],]
-points(x = g3[,2], y = g3[,3], col = "blue", add=TRUE, pch = 16, cex= 0.5)
+points(x = g3[,2], y = g3[,3], col = "blue", pch = 16, cex= 0.5)
 g2 <- limits[((limits[,3]<limits[,6])&(limits[,3]>limits[,5])),]
-points(x = g2[,2], y = g2[,3], col = "green", add=TRUE, pch = 16, cex= 0.5)
-writeLines(text = as.vector(dataM$ENSEMBL[g1[,1]]),con='G1.txt')
-writeLines(text = as.vector(dataM$ENSEMBL[g2[,1]]),con='G2.txt')
-writeLines(text = as.vector(dataM$ENSEMBL[g3[,1]]),con='G3.txt')
-library("RDAVIDWebService")
-david<-DAVIDWebService$new(email="dcosorioh@tamu.edu")
+points(x = g2[,2], y = g2[,3], col = "green", pch = 16, cex= 0.5)
+dev.off()
+
+# Output files
+writeLines(text = as.vector(dataM$ENSEMBL[g1[,1]]),con='genesByGroup/G1.txt')
+writeLines(text = as.vector(dataM$ENSEMBL[g2[,1]]),con='genesByGroup/G2.txt')
+writeLines(text = as.vector(dataM$ENSEMBL[g3[,1]]),con='genesByGroup/G3.txt')
+
