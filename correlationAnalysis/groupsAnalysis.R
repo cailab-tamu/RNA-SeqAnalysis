@@ -13,11 +13,11 @@ limits <- cbind(gene= dataM$ENSEMBL,x=dataM$scRNAseq_CV,y=log(1+dataM$RNAseq_CV)
 # Split the groups
 pdf("genesByGroup/plotGroups.pdf")
 g1 <- limits[limits[,3]>limits[,6],]
-plot(x = g1[,2], y = g1[,3], col = "red", pch = 16, cex= 0.5, ylim=c(0,1))
+plot(x = g1[,2], y = g1[,3], col = "red", pch = 16, cex= 0.7, ylim=c(0,1), xlab = "CV (scRNA-seq)", ylab= "log(CV) (RNA-seq)")
 g3 <- limits[limits[,3]<limits[,5],]
-points(x = g3[,2], y = g3[,3], col = "blue", pch = 16, cex= 0.5)
+points(x = g3[,2], y = g3[,3], col = "blue", pch = 16, cex= 0.7)
 g2 <- limits[((limits[,3]<limits[,6])&(limits[,3]>limits[,5])),]
-points(x = g2[,2], y = g2[,3], col = "green", pch = 16, cex= 0.5)
+points(x = g2[,2], y = g2[,3], col = "green", pch = 16, cex= 0.7)
 dev.off()
 
 # Output files
