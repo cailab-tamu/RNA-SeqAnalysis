@@ -7,7 +7,7 @@ plot((log(1+dataM$RNAseq_CV))~dataM$scRNAseq_CV)
 abline(lmM, col= "red")
 
 # Confidence intervals
-ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataM$scRNAseq_CV), interval="predict", level = 0.95)
+ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataM$scRNAseq_CV), interval="predict", level = 0.9)
 limits <- cbind(gene= dataM$ENSEMBL,x=dataM$scRNAseq_CV,y=log(1+dataM$RNAseq_CV),ci)
 
 # Split the groups
@@ -34,7 +34,7 @@ plot((log(1+dataT$RNAseq_CV))~dataT$scRNAseq_CV)
 abline(lmM, col= "red")
 
 # Confidence intervals
-ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataT$scRNAseq_CV), interval="predict", level = 0.95)
+ci <- predict(object = lmM,newdata = data.frame(scRNAseq_CV= dataT$scRNAseq_CV), interval="predict", level = 0.9)
 limits <- cbind(gene= dataT$ENSEMBL,x=dataT$scRNAseq_CV,y=log(1+dataT$RNAseq_CV),ci)
 
 # Split the groups
