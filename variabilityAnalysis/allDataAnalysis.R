@@ -44,7 +44,7 @@ bpM_SD <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npSD)
 bpM_VAR <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npVAR)
 bpM_CV <- bpM_SD/bpM_MEAN
 bpM_FF <- bpM_VAR/bpM_MEAN
-bpM_GC <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,giniCoefficient)
+bpM_GC <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npGC)
 output <- cbind(ENSEMBL = bpM_ENSEMBL, MEAN=bpM_MEAN, SD=bpM_SD, VAR=bpM_VAR, CV = bpM_CV, FF=bpM_FF, GC = bpM_GC)
 write.csv(output,"dataFiles/BLUEPRINT_M.csv", quote = FALSE, row.names = FALSE)
 
@@ -56,12 +56,12 @@ download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/ma
               )
 T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
 bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
-bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,mean)
-bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,sd)
-bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,var)
+bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npMEAN)
+bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npSD)
+bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npVAR)
 bpT_CV <- bpT_SD/bpT_MEAN
 bpT_FF <- bpT_VAR/bpT_MEAN
-bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,giniCoefficient)
+bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npGC)
 output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
 write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
 
