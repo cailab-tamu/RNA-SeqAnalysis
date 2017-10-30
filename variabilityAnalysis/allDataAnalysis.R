@@ -21,25 +21,25 @@ qN <- function(df){
   return(df_final)
 }
 giniCoefficient <- function(data){sum(abs(apply(expand.grid(data,-1*data),1,sum)))/(2*length(data)*sum(data))}
-npMEAN <- function(data, replicates=10000) {
+npMEAN <- function(data, replicates=1000) {
   cluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE))
   output <- mean(parSapply(cluster,seq_len(replicates), function(x){mean(sample(x = data,size = length(data),replace = TRUE))}))
   stopCluster(cluster)
   return(output)
 }
-npSD <- function(data, replicates=10000){
+npSD <- function(data, replicates=1000){
   cluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE))
   output <- mean(parSapply(cluster,seq_len(replicates), function(x){sd(sample(x = data,size = length(data),replace = TRUE))}))
   stopCluster(cluster)
   return(output)
 }
-npVAR <- function(data, replicates=10000){
+npVAR <- function(data, replicates=1000){
   cluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE))
   output <- mean(parSapply(cluster,seq_len(replicates), function(x){var(sample(x = data,size = length(data),replace = TRUE))}))
   stopCluster(cluster)
   return(output)
 }
-npGC <- function(data, replicates=10000){
+npGC <- function(data, replicates=1000){
   cluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE))
   output <- mean(parSapply(makeCluster(4),seq_len(replicates), function(x){giniCoefficient(sample(x = data,size = length(data),replace = TRUE))}))
   stopCluster(cluster)
@@ -70,188 +70,196 @@ x10gM_CV <- apply(M_10XG,1,npCV)
 x10gM_GC <- apply(M_10XG,1,npGC)
 output <- cbind(ENSEMBL = x10gM_ENSEMBL, MEAN=x10gM_MEAN, SD=x10gM_SD, VAR=x10gM_VAR, CV = x10gM_CV, FF=x10gM_FF, GC = x10gM_GC)
 write.csv(output,"dataFiles/10XGENOMICS_Monocytes.csv", quote = FALSE, row.names = FALSE)
-# 
-# ##############################################
-# # T DATA
-# ##############################################
-# # download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/T-expressionMatrix_TPM%2BQN%2BLogT.csv",
-# #               destfile = "dataFiles/T-expressionMatrix_TPM+QN+LogT.csv"
-# #               )
-# T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
-# bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
-# bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npMEAN)
-# bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npSD)
-# bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npVAR)
-# bpT_CV <- bpT_SD/bpT_MEAN
-# bpT_FF <- bpT_VAR/bpT_MEAN
-# bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npGC)
-# output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
-# write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
 
-# ##############################################
-# # T PLOTS
-# ##############################################
-# BLUEPRINT_T <- read_csv("dataFiles/BLUEPRINT_T.csv")
-# NaiveT <- read_csv("dataFiles/10XGENOMICS_NaiveT.csv")
-# merged <- merge(BLUEPRINT_T,NaiveT,by = "ENSEMBL")
-# merged <- merged[complete.cases(merged),]
-# colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV",
-#                       "RNAseq_FF", "RNAseq_GC", "scRNAseq_MEAN",
-#                       "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV", "scRNAseq_FF", "scRNAseq_GC")
-# write.csv(merged, "dataFiles/dataT.csv", row.names = FALSE, quote = FALSE)
-# 
-# pdf("allDataAnalysis/T-CVvsCV.pdf")
-# x <- merged$scRNAseq_CV
-# y <- log(1+merged$RNAseq_CV)
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "CV (scRNA-seq)", 
-#        y="log(CV) (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/T-MEANvsMEAN.pdf")
-# x <- merged$scRNAseq_MEAN
-# y <- merged$RNAseq_MEAN
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "MEAN (scRNA-seq)", 
-#        y="MEAN (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/T-SDvsSD.pdf")
-# x <- merged$scRNAseq_SD
-# y <- merged$RNAseq_SD
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "SD (scRNA-seq)", 
-#        y="SD (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/T-VARvsVAR.pdf")
-# x <- merged$scRNAseq_VAR
-# y <- merged$RNAseq_VAR
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "VAR (scRNA-seq)", 
-#        y="VAR (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/T-FFvsFF.pdf")
-# x <- merged$scRNAseq_FF
-# y <- merged$RNAseq_FF
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "FF (scRNA-seq)", 
-#        y="FF (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/T-GCvsGC.pdf")
-# x <- merged$scRNAseq_GC
-# y <- merged$RNAseq_GC
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "GC (scRNA-seq)", 
-#        y="GC (RNA-seq)")
-# dev.off()
-# ##############################################
-# # M PLOTS
-# ##############################################
-# BLUEPRINT_M <- read_csv("dataFiles/BLUEPRINT_M.csv")
-# Monocytes <- read_csv("dataFiles/10XGENOMICS_Monocytes.csv")
-# merged <- merge(BLUEPRINT_M,Monocytes,by = "ENSEMBL")
-# merged <- merged[complete.cases(merged),]
-# colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV", "RNAseq_FF",
-#                       "RNAseq_GC", "scRNAseq_MEAN", "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV",
-#                       "scRNAseq_FF", "scRNAseq_GC")
-# write.csv(merged, "dataFiles/dataM.csv", row.names = FALSE, quote = FALSE)
-# 
-# library(ggplot2)
-# pdf("allDataAnalysis/M-CVvsCV.pdf")
-# x <- merged$scRNAseq_CV
-# y <- log(1+merged$RNAseq_CV)
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "CV (scRNA-seq)", 
-#        y="log(CV) (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/M-MEANvsMEAN.pdf")
-# x <- merged$scRNAseq_MEAN
-# y <- merged$RNAseq_MEAN
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "MEAN (scRNA-seq)", 
-#        y="MEAN (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/M-SDvsSD.pdf")
-# x <- merged$scRNAseq_SD
-# y <- merged$RNAseq_SD
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "SD (scRNA-seq)", 
-#        y="SD (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/M-VARvsVAR.pdf")
-# x <- merged$scRNAseq_VAR
-# y <- merged$RNAseq_VAR
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "VAR (scRNA-seq)", 
-#        y="VAR (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/M-FFvsFF.pdf")
-# x <- merged$scRNAseq_FF
-# y <- merged$RNAseq_FF
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "FF (scRNA-seq)", 
-#        y="FF (RNA-seq)")
-# dev.off()
-# 
-# pdf("allDataAnalysis/M-GCvsGC.pdf")
-# x <- merged$scRNAseq_GC
-# y <- merged$RNAseq_GC
-# data <- as.data.frame(cbind(x,y))
-# ggplot(data, aes(x=x, y=y)) +
-#   geom_point(shape=16) +
-#   geom_smooth(method=lm, level = 0.95) + 
-#   theme_bw() +
-#   labs(x = "GC (scRNA-seq)", 
-#        y="GC (RNA-seq)")
-# dev.off()
+##############################################
+# T DATA
+##############################################
+# download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/T-expressionMatrix_TPM%2BQN%2BLogT.csv",
+#               destfile = "dataFiles/T-expressionMatrix_TPM+QN+LogT.csv"
+#               )
+T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
+bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
+bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npMEAN)
+bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npSD)
+bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npVAR)
+bpT_CV <- bpT_SD/bpT_MEAN
+bpT_FF <- bpT_VAR/bpT_MEAN
+bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npGC)
+output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
+write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
+T_10XG <- log(1+qN(readMM("dataFiles/10XGENOMICS_naiveT/matrix.mtx")))
+x10gT_ENSEMBL <- read_delim("dataFiles/10XGENOMICS_naiveT/genes.tsv",delim = "\t",col_names = FALSE)[[1]]
+x10gT_MEAN <- apply(T_10XG,1,npMEAN)
+x10gT_SD <- apply(T_10XG,1,npSD)
+x10gT_VAR <- apply(T_10XG,1,npVAR)
+x10gT_CV <- apply(T_10XG,1,npCV)
+x10gT_GC <- apply(T_10XG,1,npGC)
+output <- cbind(ENSEMBL = x10gT_ENSEMBL, MEAN=x10gT_MEAN, SD=x10gT_SD, VAR=x10gT_VAR, CV = x10gT_CV, FF=x10gT_FF, GC = x10gT_GC)
+write.csv(output,"dataFiles/10XGENOMICS_NaiveT.csv", quote = FALSE, row.names = FALSE)
+##############################################
+# T PLOTS
+##############################################
+BLUEPRINT_T <- read_csv("dataFiles/BLUEPRINT_T.csv")
+NaiveT <- read_csv("dataFiles/10XGENOMICS_NaiveT.csv")
+merged <- merge(BLUEPRINT_T,NaiveT,by = "ENSEMBL")
+merged <- merged[complete.cases(merged),]
+colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV",
+                      "RNAseq_FF", "RNAseq_GC", "scRNAseq_MEAN",
+                      "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV", "scRNAseq_FF", "scRNAseq_GC")
+write.csv(merged, "dataFiles/dataT.csv", row.names = FALSE, quote = FALSE)
+
+pdf("allDataAnalysis/T-CVvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_CV)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)",
+       y="log(CV) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-MEANvsMEAN.pdf")
+x <- merged$scRNAseq_MEAN
+y <- merged$RNAseq_MEAN
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "MEAN (scRNA-seq)",
+       y="MEAN (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-SDvsSD.pdf")
+x <- merged$scRNAseq_SD
+y <- merged$RNAseq_SD
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "SD (scRNA-seq)",
+       y="SD (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-VARvsVAR.pdf")
+x <- merged$scRNAseq_VAR
+y <- merged$RNAseq_VAR
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "VAR (scRNA-seq)",
+       y="VAR (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-FFvsFF.pdf")
+x <- merged$scRNAseq_FF
+y <- merged$RNAseq_FF
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "FF (scRNA-seq)",
+       y="FF (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/T-GCvsGC.pdf")
+x <- merged$scRNAseq_GC
+y <- merged$RNAseq_GC
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "GC (scRNA-seq)",
+       y="GC (RNA-seq)")
+dev.off()
+##############################################
+# M PLOTS
+##############################################
+BLUEPRINT_M <- read_csv("dataFiles/BLUEPRINT_M.csv")
+Monocytes <- read_csv("dataFiles/10XGENOMICS_Monocytes.csv")
+merged <- merge(BLUEPRINT_M,Monocytes,by = "ENSEMBL")
+merged <- merged[complete.cases(merged),]
+colnames(merged) <- c("ENSEMBL","RNAseq_MEAN","RNAseq_SD", "RNAseq_VAR", "RNAseq_CV", "RNAseq_FF",
+                      "RNAseq_GC", "scRNAseq_MEAN", "scRNAseq_SD", "scRNAseq_VAR", "scRNAseq_CV",
+                      "scRNAseq_FF", "scRNAseq_GC")
+write.csv(merged, "dataFiles/dataM.csv", row.names = FALSE, quote = FALSE)
+
+library(ggplot2)
+pdf("allDataAnalysis/M-CVvsCV.pdf")
+x <- merged$scRNAseq_CV
+y <- log(1+merged$RNAseq_CV)
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "CV (scRNA-seq)",
+       y="log(CV) (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-MEANvsMEAN.pdf")
+x <- merged$scRNAseq_MEAN
+y <- merged$RNAseq_MEAN
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "MEAN (scRNA-seq)",
+       y="MEAN (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-SDvsSD.pdf")
+x <- merged$scRNAseq_SD
+y <- merged$RNAseq_SD
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "SD (scRNA-seq)",
+       y="SD (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-VARvsVAR.pdf")
+x <- merged$scRNAseq_VAR
+y <- merged$RNAseq_VAR
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "VAR (scRNA-seq)",
+       y="VAR (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-FFvsFF.pdf")
+x <- merged$scRNAseq_FF
+y <- merged$RNAseq_FF
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "FF (scRNA-seq)",
+       y="FF (RNA-seq)")
+dev.off()
+
+pdf("allDataAnalysis/M-GCvsGC.pdf")
+x <- merged$scRNAseq_GC
+y <- merged$RNAseq_GC
+data <- as.data.frame(cbind(x,y))
+ggplot(data, aes(x=x, y=y)) +
+  geom_point(shape=16) +
+  geom_smooth(method=lm, level = 0.95) +
+  theme_bw() +
+  labs(x = "GC (scRNA-seq)",
+       y="GC (RNA-seq)")
+dev.off()
