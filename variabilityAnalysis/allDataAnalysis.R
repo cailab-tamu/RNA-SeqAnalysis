@@ -1,7 +1,17 @@
 #install.packages("ggplot2")
 #install.packages("readr")
 library(ggplot2)
+library(parallel)
 library(readr)
+##############################################
+# NEW FUNCTIONS
+##############################################
+GC <- function(data){sum(abs(apply(expand.grid(data,-1*data),1,sum)))/(2*length(data)*sum(data))}
+npMEAN <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){mean(sample(x = data,size = length(data),replace = TRUE))}))}
+npSD <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){sd(sample(x = data,size = length(data),replace = TRUE))}))}
+npVAR <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){var(sample(x = data,size = length(data),replace = TRUE))}))}
+npGC <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){gc(sample(x = data,size = length(data),replace = TRUE))}))}
+
 ##############################################
 # M DATA
 ##############################################
@@ -10,16 +20,11 @@ download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/ma
               )
 M_BLUEPRINT <- read_csv("dataFiles/M-expressionMatrix_TPM+QN+LogT.csv")
 bpM_ENSEMBL <- M_BLUEPRINT$ENSEMBL
-bpM_MEAN <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,mean)
-bpM_SD <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,sd)
-bpM_VAR <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,var)
+bpM_MEAN <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npMEAN)
+bpM_SD <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npSD)
+bpM_VAR <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npVAR)
 bpM_CV <- bpM_SD/bpM_MEAN
 bpM_FF <- bpM_VAR/bpM_MEAN
-giniCoefficient <- function(data){
-  numerator <- sum(abs(rowSums(expand.grid(data,-1*data))))
-  denominator <- 2*length(data)*sum(data)
-  return(numerator/denominator)
-}
 bpM_GC <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,giniCoefficient)
 output <- cbind(ENSEMBL = bpM_ENSEMBL, MEAN=bpM_MEAN, SD=bpM_SD, VAR=bpM_VAR, CV = bpM_CV, FF=bpM_FF, GC = bpM_GC)
 write.csv(output,"dataFiles/BLUEPRINT_M.csv", quote = FALSE, row.names = FALSE)
