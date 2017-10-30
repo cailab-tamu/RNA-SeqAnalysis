@@ -10,7 +10,7 @@ giniCoefficient <- function(data){sum(abs(apply(expand.grid(data,-1*data),1,sum)
 npMEAN <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){mean(sample(x = data,size = length(data),replace = TRUE))}))}
 npSD <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){sd(sample(x = data,size = length(data),replace = TRUE))}))}
 npVAR <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){var(sample(x = data,size = length(data),replace = TRUE))}))}
-npGC <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){gc(sample(x = data,size = length(data),replace = TRUE))}))}
+npGC <- function(data, replicates=1000000) {mean(parSapply(makeCluster(4),seq_len(replicates), function(x){giniCoefficient(sample(x = data,size = length(data),replace = TRUE))}))}
 
 ##############################################
 # M DATA
