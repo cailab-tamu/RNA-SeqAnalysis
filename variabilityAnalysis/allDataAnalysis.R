@@ -3,9 +3,23 @@
 library(ggplot2)
 library(parallel)
 library(readr)
+library(Matrix)
 ##############################################
 # NEW FUNCTIONS
 ##############################################
+qN <- function(df){
+  df_rank <- apply(df,2,rank,ties.method="min")
+  df_sorted <- data.frame(apply(df, 2, sort))
+  df_mean <- apply(df_sorted, 1, mean)
+  
+  index_to_mean <- function(my_index, my_mean){
+    return(my_mean[my_index])
+  }
+  
+  df_final <- apply(df_rank, 2, index_to_mean, my_mean=df_mean)
+  rownames(df_final) <- rownames(df)
+  return(df_final)
+}
 giniCoefficient <- function(data){sum(abs(apply(expand.grid(data,-1*data),1,sum)))/(2*length(data)*sum(data))}
 npMEAN <- function(data, replicates=10000) {
   cluster <- makeCluster(detectCores(all.tests = FALSE, logical = TRUE))
@@ -34,9 +48,9 @@ npGC <- function(data, replicates=10000){
 ##############################################
 # M DATA
 ##############################################
-download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/M-expressionMatrix_TPM%2BQN%2BLogT.csv",
-              destfile = "dataFiles/M-expressionMatrix_TPM+QN+LogT.csv"
-              )
+# download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/M-expressionMatrix_TPM%2BQN%2BLogT.csv",
+#               destfile = "dataFiles/M-expressionMatrix_TPM+QN+LogT.csv"
+#               )
 M_BLUEPRINT <- read_csv("dataFiles/M-expressionMatrix_TPM+QN+LogT.csv")
 bpM_ENSEMBL <- M_BLUEPRINT$ENSEMBL
 bpM_MEAN <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npMEAN)
@@ -47,23 +61,32 @@ bpM_FF <- bpM_VAR/bpM_MEAN
 bpM_GC <- apply(M_BLUEPRINT[,3:ncol(M_BLUEPRINT)],1,npGC)
 output <- cbind(ENSEMBL = bpM_ENSEMBL, MEAN=bpM_MEAN, SD=bpM_SD, VAR=bpM_VAR, CV = bpM_CV, FF=bpM_FF, GC = bpM_GC)
 write.csv(output,"dataFiles/BLUEPRINT_M.csv", quote = FALSE, row.names = FALSE)
-
-##############################################
-# T DATA
-##############################################
-download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/T-expressionMatrix_TPM%2BQN%2BLogT.csv",
-              destfile = "dataFiles/T-expressionMatrix_TPM+QN+LogT.csv"
-              )
-T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
-bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
-bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npMEAN)
-bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npSD)
-bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npVAR)
-bpT_CV <- bpT_SD/bpT_MEAN
-bpT_FF <- bpT_VAR/bpT_MEAN
-bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npGC)
-output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
-write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
+M_10XG <- log(1+qN(readMM("dataFiles/10XGENOMICS_M/matrix.mtx")))
+x10gM_ENSEMBL <- read_delim("dataFiles/10XGENOMICS_M/genes.tsv",delim = "\t",col_names = FALSE)[[1]]
+x10gM_MEAN <- apply(M_10XG,1,npMEAN)
+x10gM_SD <- apply(M_10XG,1,npSD)
+x10gM_VAR <- apply(M_10XG,1,npVAR)
+x10gM_CV <- apply(M_10XG,1,npCV)
+x10gM_GC <- apply(M_10XG,1,npGC)
+output <- cbind(ENSEMBL = x10gM_ENSEMBL, MEAN=x10gM_MEAN, SD=x10gM_SD, VAR=x10gM_VAR, CV = x10gM_CV, FF=x10gM_FF, GC = x10gM_GC)
+write.csv(output,"dataFiles/10XGENOMICS_Monocytes.csv", quote = FALSE, row.names = FALSE)
+# 
+# ##############################################
+# # T DATA
+# ##############################################
+# # download.file(url = "https://raw.githubusercontent.com/cailab-tamu/geDatasets/master/BLUEPRINT/T-expressionMatrix_TPM%2BQN%2BLogT.csv",
+# #               destfile = "dataFiles/T-expressionMatrix_TPM+QN+LogT.csv"
+# #               )
+# T_BLUEPRINT <- read_csv("dataFiles/T-expressionMatrix_TPM+QN+LogT.csv")
+# bpT_ENSEMBL <- T_BLUEPRINT$ENSEMBL
+# bpT_MEAN <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npMEAN)
+# bpT_SD <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npSD)
+# bpT_VAR <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npVAR)
+# bpT_CV <- bpT_SD/bpT_MEAN
+# bpT_FF <- bpT_VAR/bpT_MEAN
+# bpT_GC <- apply(T_BLUEPRINT[,3:ncol(T_BLUEPRINT)],1,npGC)
+# output <- cbind(ENSEMBL = bpT_ENSEMBL, MEAN=bpT_MEAN, SD=bpT_SD, VAR=bpT_VAR, CV = bpT_CV, FF=bpT_FF, GC= bpT_GC)
+# write.csv(output,"dataFiles/BLUEPRINT_T.csv", quote = FALSE, row.names = FALSE)
 
 # ##############################################
 # # T PLOTS
