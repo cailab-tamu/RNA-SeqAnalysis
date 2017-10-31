@@ -17,7 +17,7 @@ plot(x = g1[,2], y = g1[,3], col = "gray30", pch = 16, cex= 0.7, ylim=c(0,1), xl
 g3 <- limits[limits[,3]<limits[,5],]
 points(x = g3[,2], y = g3[,3], col = "gray30", pch = 16, cex= 0.7)
 g2 <- limits[((limits[,3]<limits[,6])&(limits[,3]>limits[,5])),]
-points(x = g2[,2], y = g2[,3], col = "gray90", pch = 16, cex= 0.7)
+points(x = g2[,2], y = g2[,3], col = "gray70", pch = 16, cex= 0.7)
 dev.off()
 
 # Output files
@@ -44,11 +44,10 @@ plot(x = g1[,2], y = g1[,3], col = "gray30", pch = 16, cex= 0.7, ylim=c(0,1), xl
 g3 <- limits[limits[,3]<limits[,5],]
 points(x = g3[,2], y = g3[,3], col = "gray30", pch = 16, cex= 0.7)
 g2 <- limits[((limits[,3]<limits[,6])&(limits[,3]>limits[,5])),]
-points(x = g2[,2], y = g2[,3], col = "gray90", pch = 16, cex= 0.7)
+points(x = g2[,2], y = g2[,3], col = "gray70", pch = 16, cex= 0.7)
 dev.off()
 
 # Output files
 writeLines(text = as.vector(dataT$ENSEMBL[g1[,1]]),con='genesByGroup/T-G1.txt')
 writeLines(text = as.vector(dataT$ENSEMBL[g2[,1]]),con='genesByGroup/T-G2.txt')
 writeLines(text = as.vector(dataT$ENSEMBL[g3[,1]]),con='genesByGroup/T-G3.txt')
-
